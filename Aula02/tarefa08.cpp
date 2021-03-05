@@ -11,10 +11,14 @@ void calcula_distancias(vector<vector<double>> &matrix_dist, vector<double> x, v
         vector<double> tmp;
         matrix_dist.push_back(tmp);
         for(int i2 = 0; i2 < numero_pontos; i2++){
-            double dx = (x[i] - x[i2]);
-            double dy = (y[i] - y[i2]);
-            double dist = sqrt(dx*dx+dy*dy);
-            matrix_dist[i].push_back(dist);  
+            if(i <= i2){
+                double dx = (x[i] - x[i2]);
+                double dy = (y[i] - y[i2]);
+                double dist = sqrt(dx*dx+dy*dy);
+                matrix_dist[i].push_back(dist);  
+            } else {
+                matrix_dist[i].push_back(matrix_dist[i2][i]);
+            }
         }
     }
 
