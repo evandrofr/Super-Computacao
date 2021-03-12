@@ -10,7 +10,9 @@ struct item{
     int idx;
 };
 
-bool compare(item &a, item &b) { return a.peso > b.peso; }
+
+bool comparePeso  (item &a, item &b) { return a.peso  > b.peso; }
+bool compareValor (item &a, item &b) { return a.valor < b.valor; }
 
 int main(){
     vector<item> itens;
@@ -40,7 +42,8 @@ int main(){
     }
     cout << itens[0].valor << "\n";
 
-    sort(itens.begin(), itens.end(), compare);
+    sort(itens.begin(), itens.end(), comparePeso);
+    // sort(itens.begin(), itens.end(), compareValor);
 
 
     cout << "----------------------------------------------\n";
