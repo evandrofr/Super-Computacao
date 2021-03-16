@@ -25,8 +25,8 @@ int main(){
 
     // Gerador de números pseudo aleatórios
     double rand;
-    seed_seq seed{10};
-    default_random_engine generator{seed};
+    default_random_engine generator;
+    generator.seed(10);
     uniform_real_distribution<double> distribution(0.0, 1.0);
 
 
@@ -55,7 +55,7 @@ int main(){
     cout << "----------------------------------------------\n";
 
     int rand_int;
-    uniform_int_distribution<int> distribution2(0, size);
+    
     for(int i = 0; i < size; i++){
         rand = distribution(generator); // gera número pseudo aleatório
         if(rand > 0.25){
@@ -66,6 +66,7 @@ int main(){
                 numeroItens++;
             }
         } else {
+            uniform_int_distribution<int> distribution2(i, size-1);
             rand_int = distribution2(generator);
             if(pesoTotal + itens[rand_int].peso < maxPeso){
                 resposta.push_back(itens[rand_int].idx);
