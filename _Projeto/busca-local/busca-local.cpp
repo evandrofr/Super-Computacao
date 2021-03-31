@@ -32,10 +32,7 @@ int main(){
 
     // sort(itens.begin(), itens.end(), compareValor);
     default_random_engine generator;
-    generator.seed(0);
-    uniform_int_distribution<int> distribution(0, size-1);
-
-    
+    generator.seed(0);  
 
     vector<vector<item>> resposta;
     for(int i = 0; i < pessoas; i++){
@@ -43,27 +40,20 @@ int main(){
         resposta.push_back(tmp);
     }
 
-    int MMS = 999999;
-    int MMS_idx = 999;
-    int size_copy = size;
+    int size_vector = size - 1;
     for(int i = 0; i < size; i++){
-        int rand_idx = distribution(generator);
-        cout << "rand_idx original: " << rand_idx << "\n";
-        rand_idx = rand_idx%(size_copy);
-        cout << "rand_idx resto: "<< rand_idx << "\n";
-        cout << "size_copy: " << size_copy << "\n";
+        uniform_int_distribution<int> randomItemPos(0, size_vector);
+        int rand_idx = randomItemPos(generator);
+        resposta[i%pessoas].push_back(itens[rand_idx]);
+        cout << "rand_idx: " << rand_idx << "\n";
+        cout << "Pessoa: " << i%pessoas << "\n";
         cout << "Valor: "<< itens[rand_idx].valor << " IDX: " << itens[rand_idx].idx << "\n";
         cout << "-------------------------------------------------\n";
+        
+
         itens.erase(itens.begin() + rand_idx);
-        resposta[i].push_back(itens[rand_idx]);
-        if(itens[rand_idx].valor < MMS){
-            MMS = itens[rand_idx].valor;
-            MMS_idx = i;
-        }
-        size_copy -= 1;
+        size_vector -= 1;
     }
-    // cout << "MMS: " << MMS << "\n";
-    // cout << "MMS_idx: " << MMS_idx << "\n";
 
     vector<int> lens;
     for(int i = 0; i < pessoas; i++){
@@ -71,15 +61,29 @@ int main(){
         lens.push_back(len);
     }
 
+    int MMS = 9999999;
+    int MMS_idx = 999;
+    vector<int> totais;
+    for(int i = 0; i < pessoas; i++){
+        int total = 0;
+        for(int j = 0; j < lens[i]; j++){
+            total += resposta[i][j].valor;
+        }
+        totais.push_back(total);
+        if (total < MMS){
+            MMS = total;
+            MMS_idx = i;
+        }
+    }
+    cout << "MMS: " << MMS << "\n";
+    cout << "MMS_idx: " << MMS_idx << "\n";
 
     // for(int i = 0; i < pessoas; i++){
-    //     int total = 0;
+    //     int valor_total = totais[i];
     //     for(int j = 0; j < lens[i]; j++){
-    //         total += resposta[i][j]
+    //         if(valor_total - )
     //     }
-    //     if (total < MMS)
     // }
-
 
     
     for(int i = 0; i < pessoas; i++){
