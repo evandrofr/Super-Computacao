@@ -12,7 +12,7 @@ struct item{
 };
 
 
-int busca_exaustiva(int size, vector<item> itens, int carga_total, int i, vector<int> &usados, vector<int> %melhor){
+int busca_exaustiva(int size, vector<item> itens, int carga_total, int i, vector<int> &usados, vector<int> &melhor){
     if(size == i) return 0;
     int comI;
     int semI = busca_exaustiva(size, itens, carga_total, i+1);
@@ -24,7 +24,6 @@ int busca_exaustiva(int size, vector<item> itens, int carga_total, int i, vector
 
     return max(comI, semI);
 }
-
 
 int main(){
 

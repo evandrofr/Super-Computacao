@@ -10,7 +10,7 @@ int main(){
     seed_seq seed{10};
     default_random_engine generator{seed};
     uniform_real_distribution<double> distribution(0.0, 4.0);
-    uniform_int_distribution<int> distribution2(0, 4);
+    uniform_int_distribution<int> distribution2(0, 4000);
     for (int i = 0; i < 10; i++){
         rand = distribution(generator); // gera número
         cout << rand << "\n";
