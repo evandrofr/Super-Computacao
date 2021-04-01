@@ -81,6 +81,7 @@ int main(){
 
     
     bool loop = true;
+    // int l = 0;
     while(loop){
         bool break_bool = false;
         for(int i = 0; i < pessoas; i++){
@@ -127,8 +128,12 @@ int main(){
         // cout << "MMS: " << MMS << "\n";
         // cout << "MMS_idx: " << MMS_idx << "\n";
     }
+    for(int i = 0; i < pessoas; i++){
+        sort(resposta[i].begin(), resposta[i].end(), compareIdx);
+    }
 
     cout << MMS << "\n";
+
     for(int x = 0; x < pessoas; x++){
         for(int y = 0; y < lens[x]; y++){
             cout << resposta[x][y].idx << " ";
