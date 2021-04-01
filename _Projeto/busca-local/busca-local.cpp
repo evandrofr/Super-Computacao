@@ -45,10 +45,10 @@ int main(){
         uniform_int_distribution<int> randomItemPos(0, size_vector);
         int rand_idx = randomItemPos(generator);
         resposta[i%pessoas].push_back(itens[rand_idx]);
-        cout << "rand_idx: " << rand_idx << "\n";
-        cout << "Pessoa: " << i%pessoas << "\n";
-        cout << "Valor: "<< itens[rand_idx].valor << " IDX: " << itens[rand_idx].idx << "\n";
-        cout << "-------------------------------------------------\n";
+        // cout << "rand_idx: " << rand_idx << "\n";
+        // cout << "Pessoa: " << i%pessoas << "\n";
+        // cout << "Valor: "<< itens[rand_idx].valor << " IDX: " << itens[rand_idx].idx << "\n";
+        // cout << "-------------------------------------------------\n";
         
 
         itens.erase(itens.begin() + rand_idx);
@@ -75,20 +75,63 @@ int main(){
             MMS_idx = i;
         }
     }
-    cout << "MMS: " << MMS << "\n";
-    cout << "MMS_idx: " << MMS_idx << "\n";
-
-    // for(int i = 0; i < pessoas; i++){
-    //     int valor_total = totais[i];
-    //     for(int j = 0; j < lens[i]; j++){
-    //         if(valor_total - )
-    //     }
-    // }
+    // cout << "MMS: " << MMS << "\n";
+    // cout << "MMS_idx: " << MMS_idx << "\n";
+    // ---------------------------------------------------------------------------------
 
     
-    for(int i = 0; i < pessoas; i++){
-        for(int j = 0; j < lens[i]; j++){
-            cout << resposta[i][j].idx << " ";
+    bool loop = true;
+    while(loop){
+        bool break_bool = false;
+        for(int i = 0; i < pessoas; i++){
+            int valor_total = totais[i];
+            for(int j = 0; j < lens[i]; j++){
+                if(valor_total - resposta[i][j].valor > MMS && MMS_idx != i){
+                    // cout << "-----------------------------------------------\n";
+                    item tmp = resposta[i][j];
+                    // cout << "De: " << "i = " << i << " j = " << j << " De valor: " << tmp.valor << " De idx: " << tmp.idx <<" | Para: " << "i = " << MMS_idx << "\n";
+                    resposta[MMS_idx].push_back(tmp);
+                    resposta[i].erase(resposta[i].begin() + j);
+                    break_bool = true;
+                    break;
+                }
+            }
+            if(break_bool){
+                break;
+            } else if (i == pessoas - 1){
+                loop = false;
+            }
+        }
+      
+        lens.clear();
+        for(int a = 0; a < pessoas; a++){
+            int len = resposta[a].size();
+            lens.push_back(len);
+        }
+
+
+        totais.clear();
+        MMS = 999999;
+        for(int b = 0; b < pessoas; b++){
+            int total = 0;
+            for(int c = 0; c < lens[b]; c++){
+                total += resposta[b][c].valor;
+            }
+
+            totais.push_back(total);
+            if (total < MMS){
+                MMS = total;
+                MMS_idx = b;
+            }
+        }
+        // cout << "MMS: " << MMS << "\n";
+        // cout << "MMS_idx: " << MMS_idx << "\n";
+    }
+
+    cout << MMS << "\n";
+    for(int x = 0; x < pessoas; x++){
+        for(int y = 0; y < lens[x]; y++){
+            cout << resposta[x][y].idx << " ";
         }
         cout << "\n";
     }
