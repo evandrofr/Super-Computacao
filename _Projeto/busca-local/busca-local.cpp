@@ -52,6 +52,10 @@ int main(){
     default_random_engine generator;
     generator.seed(seed);  
 
+    int MMS_final = 0;
+    vector<vector<item>> resposta_final;
+    vector<int> lens;
+
     for(int h = 0; h < iter; h++){
         // cout << "h: " << h << "\n";
          vector<item> itens_copy(itens.size());
@@ -79,7 +83,7 @@ int main(){
             size_vector -= 1;
         }
 
-        vector<int> lens;
+        lens.clear();
         for(int i = 0; i < pessoas; i++){
             int len = resposta[i].size();
             lens.push_back(len);
@@ -156,16 +160,23 @@ int main(){
             sort(resposta[i].begin(), resposta[i].end(), compareIdx);
         }
 
-        cout << MMS << "\n";
+        if(MMS > MMS_final){
+            MMS_final = MMS;
+            resposta_final.clear();
+            for(int p = 0; p < pessoas; p++){
+                resposta_final.push_back(resposta[p]);
+            }
+
+        }
+    }
+        cout << MMS_final << "\n";
 
         for(int x = 0; x < pessoas; x++){
             for(int y = 0; y < lens[x]; y++){
-                cout << resposta[x][y].idx << " ";
+                cout << resposta_final[x][y].idx << " ";
             }
             cout << "\n";
         }
-
-    }
 
     return 0;
 }
