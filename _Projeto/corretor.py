@@ -64,6 +64,11 @@ class BaseMMS:
             objects_person[o].append(i)
         
         return objects_person
+    
+    def test_solucao_final_valida(self, test, stdout, stderr):
+        N, M, values = self.parse_input(test.input)
+        mms_out, objects_person = self.parse_output(stdout, M)
+        return mms_out == self.calc_mms(values, objects_person)[0]
 
 
 class TesteBuscaLocal(ProgramTest, BaseMMS):
@@ -128,8 +133,13 @@ class TesteBuscaLocal(ProgramTest, BaseMMS):
         return True
 
 
-class TesteExaustivo(ProgramTest, CheckOutputMixin, CheckStderrMixin):
-    pass
+class TesteExaustivo(ProgramTest, BaseMMS, CheckStderrMixin):
+    def test_MMS_minimo(self, test, stdout, stderr):
+        N, M, values = self.parse_input(test.input)
+        mms_out, _ = self.parse_output(stdout, M)
+        mms_esperado, _ = self.parse_output(test.output, M)
+
+        return mms_out == mms_esperado
 
 
 class TesteHeuristico(ProgramTest, CheckOutputMixin):
@@ -158,7 +168,7 @@ def testa_busca_exaustiva():
     os.chdir('busca-global')
     compila_programa('cpp', 'global', '')
     testes_basicos = TestConfiguration.from_pattern('.', 'in*.txt', 'out*txt', 'err*txt', environ={'DEBUG': '1'})
-    tester = TesteBuscaLocal('./global', testes_basicos)
+    tester = TesteExaustivo('./global', testes_basicos)
     res = tester.main()
     os.chdir('..')
     return res
@@ -176,7 +186,7 @@ if __name__ == "__main__":
     testesD = {
         'heuristico': ('Heuristico (sequencial)', testa_heuristico),
         'local': ('Busca local (sequencial)', testa_busca_local_sequencial),
-        #'global': ('Busca exaustiva (sequencial)', testa_busca_exaustiva),
+        'global': ('Busca exaustiva (sequencial)', testa_busca_exaustiva),
         #'local-paralela': ('Busca local (paralela)', testa_busca_local_omp),
         #'local-gpu': ('Busca local (GPU)', testa_busca_local_gpu)
     }

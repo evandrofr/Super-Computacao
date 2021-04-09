@@ -8,6 +8,7 @@ using namespace std;
 struct item{
     int valor;
     int idx;
+    int dono;
 };
 
 
@@ -34,7 +35,8 @@ int main(){
     }
 
     vector<item> itens;
-
+    vector<vector<item>> resposta;
+    vector<vector<item>> resposta_final;
 
     int size;
     int pessoas;
@@ -53,16 +55,17 @@ int main(){
     generator.seed(seed);  
 
     int MMS_final = 0;
-    vector<vector<item>> resposta_final;
+    
     vector<int> lens;
-
+    vector<int> lens_final;
+    vector<int> totais;
     for(int h = 0; h < iter; h++){
         // cout << "h: " << h << "\n";
          vector<item> itens_copy(itens.size());
          copy(itens.begin(), itens.end(), itens_copy.begin());
         
 
-        vector<vector<item>> resposta;
+        resposta.clear();
         for(int i = 0; i < pessoas; i++){
             vector<item> tmp;
             resposta.push_back(tmp);
@@ -72,10 +75,11 @@ int main(){
         for(int i = 0; i < size; i++){
             uniform_int_distribution<int> randomItemPos(0, size_vector);
             int rand_idx = randomItemPos(generator);
+            itens_copy[rand_idx].dono = i%pessoas;
             resposta[i%pessoas].push_back(itens_copy[rand_idx]);
             // cout << "rand_idx: " << rand_idx << "\n";
             // cout << "Pessoa: " << i%pessoas << "\n";
-            // cout << "Valor: "<< itens[rand_idx].valor << " IDX: " << itens[rand_idx].idx << "\n";
+            // cout << "Valor: "<< itens_copy[rand_idx].valor << " IDX: " << itens_copy[rand_idx].idx << "\n";
             // cout << "-------------------------------------------------\n";
             
 
@@ -91,7 +95,7 @@ int main(){
 
         int MMS = 9999999;
         int MMS_idx = 999;
-        vector<int> totais;
+        totais.clear();
         for(int i = 0; i < pessoas; i++){
             int total = 0;
             for(int j = 0; j < lens[i]; j++){
@@ -113,9 +117,10 @@ int main(){
             for(int i = 0; i < pessoas; i++){
                 int valor_total = totais[i];
                 for(int j = 0; j < lens[i]; j++){
-                    if(valor_total - resposta[i][j].valor > MMS && MMS_idx != i){
+                    if(valor_total - resposta[i][j].valor > MMS){
                         // cout << "-----------------------------------------------\n";
-                        item tmp = resposta[i][j];
+                        struct item tmp;
+                        tmp = resposta[i][j];
                         // cout << "De: " << "i = " << i << " j = " << j << " De valor: " << tmp.valor << " De idx: " << tmp.idx <<" | Para: " << "i = " << MMS_idx << "\n";
                         resposta[MMS_idx].push_back(tmp);
                         resposta[i].erase(resposta[i].begin() + j);
@@ -160,23 +165,35 @@ int main(){
             sort(resposta[i].begin(), resposta[i].end(), compareIdx);
         }
 
+        if(debug == 1){
+            cerr << MMS << " ";
+            for(int e = 0; e < pessoas; e++){
+                for(int u = 0; u < lens[e]; u++){
+                    cerr << resposta[e][u].dono << " ";
+                }
+            }
+            cerr << "\n";
+        }
+
         if(MMS > MMS_final){
             MMS_final = MMS;
-            resposta_final.clear();
-            for(int p = 0; p < pessoas; p++){
-                resposta_final.push_back(resposta[p]);
-            }
+            lens_final = lens;
+            resposta_final = resposta;
 
         }
+
+ 
+
     }
-        cout << MMS_final << "\n";
 
-        for(int x = 0; x < pessoas; x++){
-            for(int y = 0; y < lens[x]; y++){
-                cout << resposta_final[x][y].idx << " ";
-            }
-            cout << "\n";
+    cout << MMS_final << "\n";
+
+    for(int x = 0; x < pessoas; x++){
+        for(int y = 0; y < lens_final[x]; y++){
+            cout << resposta_final[x][y].idx << " ";
         }
+        cout << "\n";
+    }
 
     return 0;
 }
