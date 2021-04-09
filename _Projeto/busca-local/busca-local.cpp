@@ -121,6 +121,7 @@ int main(){
                         // cout << "-----------------------------------------------\n";
                         struct item tmp;
                         tmp = resposta[i][j];
+                        tmp.dono = MMS_idx;
                         // cout << "De: " << "i = " << i << " j = " << j << " De valor: " << tmp.valor << " De idx: " << tmp.idx <<" | Para: " << "i = " << MMS_idx << "\n";
                         resposta[MMS_idx].push_back(tmp);
                         resposta[i].erase(resposta[i].begin() + j);
@@ -167,12 +168,23 @@ int main(){
 
         if(debug == 1){
             cerr << MMS << " ";
-            for(int e = 0; e < pessoas; e++){
-                for(int u = 0; u < lens[e]; u++){
-                    cerr << resposta[e][u].dono << " ";
+
+            for(int r = 0; r < (int) itens.size(); r++){
+                for(int x = 0; x < pessoas; x++){
+                    for(int y = 0; y < lens[x]; y++){
+                        if(itens[r].idx == resposta[x][y].idx){
+                            cerr << resposta[x][y].dono << " ";
+                        }
+                    }
                 }
             }
             cerr << "\n";
+            // for(int e = 0; e < pessoas; e++){
+            //     for(int u = 0; u < lens[e]; u++){
+            //         cerr << resposta[e][u].dono << " ";
+            //     }
+            // }
+            // cerr << "\n";
         }
 
         if(MMS > MMS_final){
