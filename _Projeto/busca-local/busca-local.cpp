@@ -5,6 +5,7 @@
 
 using namespace std;
 
+
 struct item{
     int valor;
     int idx;
@@ -16,6 +17,8 @@ bool compareValor (item &a, item &b) { return a.valor > b.valor; } // > para dec
 bool compareIdx   (item &a, item &b) { return a.idx < b.idx; } // > para decrescente e < para crescente
 
 int main(){
+
+    //Pegar variaveis de ambiente
     int seed = 0;
     char *SEED_VAR = getenv("SEED");
     if (SEED_VAR != NULL){
@@ -33,11 +36,15 @@ int main(){
     if (DEBUG_VAR != NULL){
         debug = atoi(DEBUG_VAR);
     }
-
+    // Criando vetores
     vector<item> itens;
     vector<vector<item>> resposta;
     vector<vector<item>> resposta_final;
+    vector<int> lens;
+    vector<int> lens_final;
+    vector<int> totais;
 
+    // Pegando os valores do arquivo
     int size;
     int pessoas;
     cin >> size;
@@ -50,49 +57,47 @@ int main(){
         itens.push_back(tmp);
     }
 
-    
+    // Criando gerador de numeros aleatorios e colocando a seed
     default_random_engine generator;
     generator.seed(seed);  
 
+    // Loop de 100000 iteracoes
     int MMS_final = 0;
-    
-    vector<int> lens;
-    vector<int> lens_final;
-    vector<int> totais;
     for(int h = 0; h < iter; h++){
-        // cout << "h: " << h << "\n";
+        // Copiando vetor itens para poder altera-lo
          vector<item> itens_copy(itens.size());
          copy(itens.begin(), itens.end(), itens_copy.begin());
         
-
+        // Limpando vetor resposta e preenchendo com um vetor vazio para cada pessoa
         resposta.clear();
         for(int i = 0; i < pessoas; i++){
             vector<item> tmp;
             resposta.push_back(tmp);
         }
 
+        // Distribuindo itens para as pessoas de forma aleatoria
+        // Sorteia um numero correspondendo ao index do item, atribui um dono ao item sorteaod, coloca esse item na lista resposta
+        // Apaga o item e diminui o numero do proximo sorteio
         int size_vector = size - 1;
         for(int i = 0; i < size; i++){
             uniform_int_distribution<int> randomItemPos(0, size_vector);
             int rand_idx = randomItemPos(generator);
             itens_copy[rand_idx].dono = i%pessoas;
             resposta[i%pessoas].push_back(itens_copy[rand_idx]);
-            // cout << "rand_idx: " << rand_idx << "\n";
-            // cout << "Pessoa: " << i%pessoas << "\n";
-            // cout << "Valor: "<< itens_copy[rand_idx].valor << " IDX: " << itens_copy[rand_idx].idx << "\n";
-            // cout << "-------------------------------------------------\n";
-            
 
             itens_copy.erase(itens_copy.begin() + rand_idx);
             size_vector -= 1;
         }
-
+        
+        // Limpa o vetor de tamanho e o preenche com o tamanho dos vetores de cada pessoa
         lens.clear();
         for(int i = 0; i < pessoas; i++){
             int len = resposta[i].size();
             lens.push_back(len);
         }
 
+        // Calcula o MMS e salva o idx da pessoa que e MMS
+        // Tambem limpa o vetor de totais e o preenche com o valor total de cada pessoa
         int MMS = 9999999;
         int MMS_idx = 999;
         totais.clear();
@@ -107,22 +112,22 @@ int main(){
                 MMS_idx = i;
             }
         }
-        // cout << "MMS: " << MMS << "\n";
-        // cout << "MMS_idx: " << MMS_idx << "\n";
+
         // ---------------------------------------------------------------------------------
-        
+        // loop de doacoes
         bool loop = true;
         while(loop){
+            // Percorre cada item de cada pessoa e verifica se o valor total dessa pessoa sem esse objeto e maior que o MMS
+            // Caso seja ocorre a doacao
+            // Passa o item para o MMS e quebra o loop
             bool break_bool = false;
             for(int i = 0; i < pessoas; i++){
                 int valor_total = totais[i];
                 for(int j = 0; j < lens[i]; j++){
                     if(valor_total - resposta[i][j].valor > MMS){
-                        // cout << "-----------------------------------------------\n";
                         struct item tmp;
                         tmp = resposta[i][j];
                         tmp.dono = MMS_idx;
-                        // cout << "De: " << "i = " << i << " j = " << j << " De valor: " << tmp.valor << " De idx: " << tmp.idx <<" | Para: " << "i = " << MMS_idx << "\n";
                         resposta[MMS_idx].push_back(tmp);
                         resposta[i].erase(resposta[i].begin() + j);
                         break_bool = true;
@@ -136,7 +141,7 @@ int main(){
                 }
             }
             
-
+            // Limpa o vetor de tamanho e o preenche com o tamanho dos vetores de cada pessoa
             lens.clear();
             for(int a = 0; a < pessoas; a++){
                 int len = resposta[a].size();
@@ -144,6 +149,8 @@ int main(){
             }
 
 
+            // Calcula o MMS e salva o idx da pessoa que e MMS
+            // Tambem limpa o vetor de totais e o preenche com o valor total de cada pessoa
             totais.clear();
             MMS = 999999;
             for(int b = 0; b < pessoas; b++){
@@ -158,14 +165,14 @@ int main(){
                     MMS_idx = b;
                 }
             }
-            // cout << "MMS: " << MMS << "\n";
-            // cout << "MMS_idx: " << MMS_idx << "\n";
         }
-
+        // Ordena os vetores de cada pessoa pelos index dos itens
         for(int i = 0; i < pessoas; i++){
             sort(resposta[i].begin(), resposta[i].end(), compareIdx);
         }
 
+        // Apenas para a funcao DEBUG
+        // Printa o MMS de casa iteracao junto com os donos de cada objeto na ordem original
         if(debug == 1){
             cerr << MMS << " ";
 
@@ -179,25 +186,15 @@ int main(){
                 }
             }
             cerr << "\n";
-            // for(int e = 0; e < pessoas; e++){
-            //     for(int u = 0; u < lens[e]; u++){
-            //         cerr << resposta[e][u].dono << " ";
-            //     }
-            // }
-            // cerr << "\n";
         }
-
+        // Caso o MMS da iteracao seja maior que o MMS_final anterior, o substitui
         if(MMS > MMS_final){
             MMS_final = MMS;
             lens_final = lens;
             resposta_final = resposta;
-
         }
-
- 
-
     }
-
+    // Print final do MMS mais os index dos itens de cada pessoa
     cout << MMS_final << "\n";
 
     for(int x = 0; x < pessoas; x++){
