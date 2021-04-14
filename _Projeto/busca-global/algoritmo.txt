@@ -1,0 +1,12 @@
+funcao recursica recebe vetor de pessoas e de objetos(ambos nao &), vetor dos melhores objetos (com &), indice do objeto atual, o melhor mms(ponteiro) e o total de iteracoes
+se caso base
+    incrementa total de iteracoes
+    pega o mms atual
+    se mms atual for maior que melhor mms
+        atualizar melhor mms
+        copiar objetos autal para melhores objetos
+caso contrario
+    para cada pessoa em vetor de pessoas
+        colocar o objeto atual (objeto com indice de objeto atual) na pessoa dessa iteracao
+        chamar a funcao recursica com os mesmo parametros porem indice do objeto atual incrementado
+        remover objeto atual (objeto com indice de objeto atual) da pessoa dessa iteracao
