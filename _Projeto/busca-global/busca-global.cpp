@@ -25,7 +25,7 @@ int calcula_mms(vector<item> itens, int num_pessoas){
     for(int i = 0; i < (int) itens.size(); i++){
         mms += itens[i].valor;
     }
-    // Pega
+    // Pega o menor dos valores de totais
     for(int i = 0; i < num_pessoas; i++){
         if(totais[i] < mms){
             mms = totais[i];
@@ -35,28 +35,25 @@ int calcula_mms(vector<item> itens, int num_pessoas){
 }
 
 void busca_global(int num_pessoas, vector<item> itens, vector<item> &melhores_itens, int idx_item, int *melhor_mms, int *total_iter){
+    // Base da recursão
     if ((int) itens.size() == idx_item){
+        // Contador de quantas nos tem na base da arvore
         *total_iter += 1;
-        // cout << "total_iter: " << *total_iter << "\n";
+        // Pegando o maior dos mms possíveis
         int mms = calcula_mms(itens, num_pessoas);
         if(mms > *melhor_mms){
             *melhor_mms = mms;
-            // cout << "melhor_mms: " << *melhor_mms << "\n";
-            // cout << "mms: " << mms << "\n"; 
             melhores_itens = itens;
         }
 
     } else {
+        // loop e recursao para ter todas as combinacoes possiveis entre pessoas e objetos
         for(int x = 0; x < num_pessoas; x++){
             itens[idx_item].dono = x;
-            // cout << "Dono: " << itens[idx_item].dono << "\n";
             busca_global(num_pessoas, itens, melhores_itens, idx_item + 1, melhor_mms, total_iter);
         }
     }
 }
-
-bool compareValor (item &a, item &b) { return a.valor > b.valor; } // > para decrescente e < para crescente
-bool compareIdx   (item &a, item &b) { return a.idx < b.idx; } // > para decrescente e < para crescente
 
 int main(){
 
@@ -100,9 +97,10 @@ int main(){
     }
 
 
-
+    // Chamando funcao recursiva
     busca_global(pessoas, itens, melhores_itens, 0, ptr_melhor_mms, ptr_total_iter);
 
+    //debug
     if(debug == 1){
         cerr << total_iter;
     }
