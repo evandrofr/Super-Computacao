@@ -24,3 +24,6 @@ sejam justas, porém com valor de MMS maior são de pior qualidade do que soluç
 menor MMS. Se quisermos simplesmente descartar soluções que não sejam justas, que valor deveríamos
 atribuir a elas? E como saber se a solução final obtida é justa?
 
+Para descartar soluções não justas devemos atribuir o MMS 0 (zero) a elas, dessa forma elas sempre serão consideradas piores que as demais.
+Para saber se a solução final é justa, devemos comparar o valor total de cada criança com o MMS minimo estipulado a ela. Caso pelo menos um desses totais seja menor que o MMS minimo da criança, a solução não é justa.
+
