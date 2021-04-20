@@ -1,0 +1,26 @@
+Pergunta2
+
+Considere a estratégia de alocação para o problema de MMS com diferentes preferências que entrega
+primeiro o objeto mais valioso para a pessoa 1 (sob a perspectiva dessa pessoa), depois o mais valioso para
+a pessoa 2 que ainda não tenha sido alocado, e assim por diante, até acabarem os objetos. Considerando
+Alice como a pessoa 1, George como a pessoa 2 e Dina como a pessoa 3, e considerando ainda os valores
+atribuídos dos objetos fornecidas no enunciado, qual é a alocação de objetos resultante dessa estratégia?
+Ela é justa no sentido da MMS? Qual é o valor da partição menos valiosa?
+
+- Alice(1) -> Obj(idx: 4, valor: 9), Obj(idx: 2, valor: 5) -> valor total 14
+- George(2) -> Obj(idx: 1, valor: 7), Obj(idx: 0, valor: 1) -> valor total 8
+- Dina(3) -> Obj(idx: 3, valor: 4) -> valor total 4
+
+O valor da partição menos valiosa é 4 cujo o dono é a Dina.
+Ela é justa no sentido da MMS pois ela alcança ou ultrapassa os valores minimos para cada uma das crianças.
+
+Pergunta 3
+
+No projeto da disciplina, vocês elaboraram um programa para encontrar o máximo global para o MMS com
+iguais preferências, ou seja, os objetos são avaliados da mesma forma por todas as pessoas participantes
+do seu particionamento. Assim, a qualidade de uma possível solução era dada simplesmente pelo valor da
+MMS. Quando consideramos o mesmo objetivo, porém admitindo diferentes preferências, soluções que não
+sejam justas, porém com valor de MMS maior são de pior qualidade do que soluções justas, porém com
+menor MMS. Se quisermos simplesmente descartar soluções que não sejam justas, que valor deveríamos
+atribuir a elas? E como saber se a solução final obtida é justa?
+

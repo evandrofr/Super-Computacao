@@ -1,0 +1,4 @@
+Pergunta 1
+Como você resolveria este problema? Descreva em alto nível um algoritmo que tenta minimizar o custo final
+e crie 4 pares de arquivos entrada/saída que exemplifiquem a aplicação de seu algoritmo.
+- Eu utilizaria uma heuristica para resolver o problema. Atribuindo o menor custo por quilometro rodado a maior distancia e o maior custo a menor distancia se obtem a solução ótima do problema.
