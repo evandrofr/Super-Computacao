@@ -1,4 +1,5 @@
 import os
+import os.path as osp
 import io
 import sys
 import pprint
@@ -67,71 +68,98 @@ class BaseMMS:
     
     def test_solucao_final_valida(self, test, stdout, stderr):
         N, M, values = self.parse_input(test.input)
-        mms_out, objects_person = self.parse_output(stdout, M)
-        return mms_out == self.calc_mms(values, objects_person)[0]
+        try:
+            mms_out, objects_person = self.parse_output(stdout, M)
+            return mms_out == self.calc_mms(values, objects_person)[0]
+        except ValueError:
+            print('Format error')
+            return False
 
 
 class TesteBuscaLocal(ProgramTest, BaseMMS):
     def test_roda_iter_vezes(self, test, stdout, stderr):
+        if test.environ['DEBUG'] == '0': return True
+
         N, M, values = self.parse_input(test.input)
         return len(stderr.split('\n')) == int(test.environ['ITER'])
 
     def test_solucao_final_eh_melhore_e_valida(self, test, stdout, stderr):
+        if test.environ['DEBUG'] == '0': return True
+
         N, M, values = self.parse_input(test.input)
         max_val = 0
-        for sol in stderr.split('\n'):
-            val, *aloc = [int(i) for i in sol.split()]
+        try:
+            for sol in stderr.split('\n'):
+                val, *aloc = [int(i) for i in sol.split()]
 
-            if val > max_val:
-                max_val = val
-            
-        mms_out, objects_person_out = self.parse_output(stdout, M)
-        mms_out_recalc, _ = self.calc_mms(values, objects_person_out)
+                if val > max_val:
+                    max_val = val
+                
+            mms_out, objects_person_out = self.parse_output(stdout, M)
+            mms_out_recalc, _ = self.calc_mms(values, objects_person_out)
+        except ValueError:
+            print('Format error')
+            return False
+
         return max_val == mms_out and mms_out == mms_out_recalc
         
     def test_toda_solucao_valida(self, test, stdout, stderr):
+        if test.environ['DEBUG'] == '0': return True
+
         N, M, values = self.parse_input(test.input)
-        for sol in stderr.split('\n'):
-            val, *aloc = [int(i) for i in sol.split()]
+        try:
+            for sol in stderr.split('\n'):
+                val, *aloc = [int(i) for i in sol.split()]
 
-            objects_person = self.objects_person_from_aloc(aloc, M)
-            min_mms, person = self.calc_mms(values, objects_person)
-            
-            if min_mms != val:
-                print('Erro no cálculo do MMS:', sol)
-                print('Calculado:', min_mms)
-                return False
+                objects_person = self.objects_person_from_aloc(aloc, M)
+                min_mms, person = self.calc_mms(values, objects_person)
+                
+                if min_mms != val:
+                    print('Erro no cálculo do MMS:', sol)
+                    print('Calculado:', min_mms)
+                    return False
 
-        return True
+            return True
+        except ValueError:
+            print('Format error')
+            return False
     
     def test_toda_solucao_sem_troca(self, test, stdout, stderr):
-        N, M, values = self.parse_input(test.input)
-        for sol in stderr.split('\n'):
-            val, *aloc = [int(i) for i in sol.split()]
-            if len(aloc) != N:
-                print(f'Vetor de alocação tem menos que {N} objetos')
-                return False
-            sol_objects_person = self.objects_person_from_aloc(aloc, M)
-            sol_min_mms, sol_person = self.calc_mms(values, sol_objects_person)
-            
-            for i in range(N):
-                for j in range(N):
-                    if i == j: continue
-                    aloc[i], old_aloc_i = aloc[j], aloc[i]
-                    objects_person = self.objects_person_from_aloc(aloc, M)
-                    swap_min_mms, swap_person = self.calc_mms(values, objects_person)
-                    
-                    if swap_min_mms > sol_min_mms:
-                        print('Doação de', i, 'para', j, 'possível')
-                        print('Alocação antiga:', sol_objects_person)
-                        print('Alocação nova:', objects_person)
-                        print('Novo MMS', swap_min_mms)
-                        return False
-                    
-                    aloc[i], aloc[j] = old_aloc_i, aloc[i]
-                    
-        return True
+        if test.environ['DEBUG'] == '0': return True
 
+        N, M, values = self.parse_input(test.input)
+        try:
+            for sol in stderr.split('\n'):
+                val, *aloc = [int(i) for i in sol.split()]
+                if len(aloc) != N:
+                    print(f'Vetor de alocação tem menos que {N} objetos')
+                    return False
+                sol_objects_person = self.objects_person_from_aloc(aloc, M)
+                sol_min_mms, sol_person = self.calc_mms(values, sol_objects_person)
+                
+                for i in range(N):
+                    for j in range(N):
+                        if i == j: continue
+                        aloc[i], old_aloc_i = aloc[j], aloc[i]
+                        objects_person = self.objects_person_from_aloc(aloc, M)
+                        swap_min_mms, swap_person = self.calc_mms(values, objects_person)
+                        
+                        if swap_min_mms > sol_min_mms:
+                            print('Doação de', i, 'para', j, 'possível')
+                            print('Alocação antiga:', sol_objects_person)
+                            print('Alocação nova:', objects_person)
+                            print('Novo MMS', swap_min_mms)
+                            return False
+                        
+                        aloc[i], aloc[j] = old_aloc_i, aloc[i]
+                        
+            return True
+        except ValueError:
+            print('Format error')
+            return False
+
+class TesteMultiCore(TesteBuscaLocal, CheckMultiCorePerformance):
+    pass
 
 class TesteExaustivo(ProgramTest, BaseMMS, CheckStderrMixin):
     def test_MMS_minimo(self, test, stdout, stderr):
@@ -148,33 +176,79 @@ class TesteHeuristico(ProgramTest, CheckOutputMixin):
 
 def testa_heuristico():
     os.chdir('heuristico')
-    compila_programa('cpp', 'heuristico', '')
-    tests = TestConfiguration.from_pattern('.', 'in*.txt', 'out*txt')
-    tester = TesteHeuristico('./heuristico', tests)
-    res = tester.main()
+    try:
+        compila_programa('cpp', 'heuristico', '')
+    except IOError:
+        res = False
+    else:
+        tests = TestConfiguration.from_pattern('.', 'in*.txt', 'out*txt')
+        tester = TesteHeuristico('./heuristico', tests)
+        res = tester.main()
+
     os.chdir('..')
     return res
 
 def testa_busca_local_sequencial():
     os.chdir('busca-local')
-    compila_programa('cpp', 'local', '')
-    testes_basicos = TestConfiguration.from_pattern('.', 'in*.txt', 'out*txt', environ={'DEBUG': '1', 'ITER': '10'})
-    tester = TesteBuscaLocal('./local', testes_basicos)
-    res = tester.main()
+    try:
+        compila_programa('cpp', 'local', '')
+    except IOError:
+        res = False
+    else:
+        testes_basicos = {
+            inp:TestConfiguration.from_file(inp, out, environ={'DEBUG': '1', 'ITER': '10'}, time_limit=300)
+            for inp,out in [('in7.txt', 'out7.txt'),('in8.txt', 'out8.txt'),
+                            ('in9.txt', 'out9.txt'),('in10.txt', 'out10.txt'),
+                            ('in11.txt', 'out11.txt'),('in12.txt', 'out12.txt')]
+        }
+        tester = TesteBuscaLocal('./local', testes_basicos)
+        res = tester.main()
+    
     os.chdir('..')
     return res
 
 def testa_busca_exaustiva():
     os.chdir('busca-global')
-    compila_programa('cpp', 'global', '')
-    testes_basicos = TestConfiguration.from_pattern('.', 'in*.txt', 'out*txt', 'err*txt', environ={'DEBUG': '1'})
-    tester = TesteExaustivo('./global', testes_basicos)
-    res = tester.main()
+    try:
+        compila_programa('cpp', 'global', '')
+    except IOError:
+        res = False
+    else:
+        testes_basicos = TestConfiguration.from_pattern('.', 'in*.txt', 'out*txt', 'err*txt', environ={'DEBUG': '1'}, time_limit=300)
+        tester = TesteExaustivo('./global', testes_basicos)
+        res = tester.main()
+
     os.chdir('..')
     return res
 
 def testa_busca_local_omp():
-    return False
+    os.chdir('busca-local')
+    try:
+        compila_programa('cpp', 'local-omp', '-fopenmp')
+    except IOError:
+        res = False
+    else:
+        testes_basicos = {
+            inp:TestConfiguration.from_file(inp, out, environ={'DEBUG': '1', 'ITER': '10'}, time_limit=300)
+            for inp,out in [('in7.txt', 'out7.txt'),('in8.txt', 'out8.txt'),
+                            ('in9.txt', 'out9.txt')]
+        }
+        teste_sequencial = TesteBuscaLocal('./local-omp', testes_basicos)
+        res = teste_sequencial.main()
+
+        testes_grandes = {
+            inp:TestConfiguration.from_file(inp, out, environ={'DEBUG': '0', 'ITER': '100000'}, time_limit=10)
+            for inp,out in [('in10.txt', 'out10.txt'),
+                            ('in11.txt', 'out11.txt'),('in12.txt', 'out12.txt'),
+                            ('in13.txt', 'out13.txt'),('in14.txt', 'out14.txt'),
+                            ('in15.txt', 'out15.txt')]
+        }
+        
+        teste_multi_core = TesteMultiCore('./local-omp', testes_grandes)
+        res = teste_multi_core.main() and res
+    
+    os.chdir('..')
+    return res
 
 def testa_busca_local_gpu():
     return False
@@ -187,7 +261,7 @@ if __name__ == "__main__":
         'heuristico': ('Heuristico (sequencial)', testa_heuristico),
         'local': ('Busca local (sequencial)', testa_busca_local_sequencial),
         'global': ('Busca exaustiva (sequencial)', testa_busca_exaustiva),
-        #'local-paralela': ('Busca local (paralela)', testa_busca_local_omp),
+        'multi-core': ('Busca local (paralela)', testa_busca_local_omp),
         #'local-gpu': ('Busca local (GPU)', testa_busca_local_gpu)
     }
 
@@ -197,9 +271,21 @@ if __name__ == "__main__":
             tst = testesD[tst]
             print(tst[0], ':', test_result(tst[1]()))
             sys.exit(0)
+        else:
+            print('Testes disponíveis:')
+            pprint.pprint(testesD)
+    else:
+        print('Rodando todos os testes')
+        print('Testes disponíveis:')
+        pprint.pprint(testesD)
 
-    print('Testes disponíveis:')
-    pprint.pprint(testesD)
+        resultados = [osp.split(os.getcwd())[1]] 
+        testes = [testa_heuristico, testa_busca_local_sequencial, testa_busca_exaustiva]
+        for t in testes:
+            resultados.append('X' if t() else ' ')
+
+        print(','.join(resultados), file=sys.stderr)
+
 
 
 
