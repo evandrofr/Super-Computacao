@@ -10,23 +10,13 @@ int main() {
     step = 1.0 / (double)num_steps;
 
     auto start_time = std::chrono::high_resolution_clock::now();
-    double res_parte1, res_parte2 = 0.0;
 
-    #pragma omp parallel
-    {
-        #pragma omp master
-        {
-            #pragma omp for
-            {
-                for (i = 0; i < num_steps; i++) {
-                    x = (i + 0.5) * step;
-                    res_parte1 = res_parte1 + 4.0 / (1.0 + x * x);
-                }
-            }
-        }
+    #pragma omp parallel for reduction (+:sum)
+    for (i = 0; i < num_steps; i++) {
+        x = (i + 0.5) * step;
+        sum += 4.0 / (1.0 + x * x);
     }
-    sum = res_parte1 + res_parte2;
-    
+        
 
 
     pi = step * sum;
