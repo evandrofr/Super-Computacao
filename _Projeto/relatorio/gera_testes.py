@@ -1,7 +1,7 @@
 import os
 import random
 
-def gera_testes(n_testes=8, test_name="10", x_persons=10, x_objects=1, N_min_value=1, N_max_value=50, lock_person=True, lock_objects = False):
+def gera_testes(n_testes=10, test_name="25", x_persons=25, x_objects=150, N_min_value=1, N_max_value=50, lock_person=True, lock_objects = False):
     path = os.getcwd() + "/testes/" + test_name
     try:
         for file in os.listdir(path):
@@ -13,14 +13,14 @@ def gera_testes(n_testes=8, test_name="10", x_persons=10, x_objects=1, N_min_val
     except OSError:
         pass
     
-    random.seed(10)
+    random.seed(42)
     for i in range(n_testes):
         if lock_person == False:
             M = 1 + x_persons * i # persons
         else:
             M = x_persons
         if lock_objects == False:
-            N = M + 1 + x_objects * i # objects
+            N = M + 75 + x_objects * i # objects
         else: 
             N = x_objects  
         f= open(f"/{path}/in{i}.txt","w+")
@@ -30,4 +30,5 @@ def gera_testes(n_testes=8, test_name="10", x_persons=10, x_objects=1, N_min_val
             f.write("%d " % (n_value))
         f.close()
 
-gera_testes()
+if __name__ == "__main__":
+    gera_testes()
